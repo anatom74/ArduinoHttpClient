@@ -94,7 +94,7 @@ public:
     */
     int post(const char* aURLPath, const char* aContentType, const char* aBody);
     int post(const String& aURLPath, const String& aContentType, const String& aBody);
-    int post(const char* aURLPath, const char* aContentType, int aContentLength, const byte aBody[]);
+    int post(const char* aURLPath, const char* aContentType, long aContentLength, const byte aBody[]);
 
     /** Connect to the server and start to send a PUT request.
       @param aURLPath     Url to request
@@ -112,7 +112,7 @@ public:
     */
     int put(const char* aURLPath, const char* aContentType, const char* aBody);
     int put(const String& aURLPath, const String& aContentType, const String& aBody);
-    int put(const char* aURLPath, const char* aContentType, int aContentLength, const byte aBody[]);
+    int put(const char* aURLPath, const char* aContentType, long aContentLength, const byte aBody[]);
 
     /** Connect to the server and start to send a PATCH request.
       @param aURLPath     Url to request
@@ -130,7 +130,7 @@ public:
     */
     int patch(const char* aURLPath, const char* aContentType, const char* aBody);
     int patch(const String& aURLPath, const String& aContentType, const String& aBody);
-    int patch(const char* aURLPath, const char* aContentType, int aContentLength, const byte aBody[]);
+    int patch(const char* aURLPath, const char* aContentType, long aContentLength, const byte aBody[]);
 
     /** Connect to the server and start to send a DELETE request.
       @param aURLPath     Url to request
@@ -148,7 +148,7 @@ public:
     */
     int del(const char* aURLPath, const char* aContentType, const char* aBody);
     int del(const String& aURLPath, const String& aContentType, const String& aBody);
-    int del(const char* aURLPath, const char* aContentType, int aContentLength, const byte aBody[]);
+    int del(const char* aURLPath, const char* aContentType, long aContentLength, const byte aBody[]);
 
     /** Connect to the server and start to send the request.
         If a body is provided, the entire request (including headers and body) will be sent
@@ -162,13 +162,13 @@ public:
     int startRequest(const char* aURLPath,
                      const char* aHttpMethod,
                      const char* aContentType = NULL,
-                     int aContentLength = -1,
+                     long aContentLength = -1,
                      const byte aBody[] = NULL);
 
     /** Send an additional header line.  This can only be called in between the
-      calls to beginRequest and endRequest.
+      calls to startRequest and finishRequest.
       @param aHeader Header line to send, in its entirety (but without the
-                     trailing CRLF.  E.g. "Authorization: Basic YQDDCAIGES"
+                     trailing CRLF.  E.g. "Authorization: Basic YQDDCAIGES" 
     */
     void sendHeader(const char* aHeader);
 
@@ -272,7 +272,7 @@ public:
       @return Length of the body, in bytes, or kNoContentLengthHeader if no
       Content-Length header was returned by the server
     */
-    int contentLength();
+    long contentLength();
 
     /** Returns if the response body is chunked
       @return true if response body is chunked, false otherwise
@@ -307,7 +307,7 @@ public:
     virtual int read();
     virtual int read(uint8_t *buf, size_t size);
     virtual int peek() { return iClient->peek(); };
-    virtual void flush() { iClient->flush(); };
+    virtual void flush() { return iClient->flush(); };
 
     // Inherited from Client
     virtual int connect(IPAddress ip, uint16_t port) { return iClient->connect(ip, port); };
@@ -372,9 +372,9 @@ protected:
     // Stores the status code for the response, once known
     int iStatusCode;
     // Stores the value of the Content-Length header, if present
-    int iContentLength;
+    long iContentLength;
     // How many bytes of the response body have been read by the user
-    int iBodyLengthConsumed;
+    long iBodyLengthConsumed;
     // How far through a Content-Length header prefix we are
     const char* iContentLengthPtr;
     // How far through a Transfer-Encoding chunked header we are
