@@ -64,7 +64,7 @@ void HttpClient::beginRequest()
 }
 
 int HttpClient::startRequest(const char* aURLPath, const char* aHttpMethod, 
-                                const char* aContentType, int aContentLength, const byte aBody[])
+                                const char* aContentType, long aContentLength, const byte aBody[])
 {
     if (iState == eReadingBody || iState == eReadingChunkLength || iState == eReadingBodyChunk)
     {
@@ -311,7 +311,7 @@ int HttpClient::post(const String& aURLPath, const String& aContentType, const S
     return post(aURLPath.c_str(), aContentType.c_str(), aBody.length(), (const byte*)aBody.c_str());
 }
 
-int HttpClient::post(const char* aURLPath, const char* aContentType, int aContentLength, const byte aBody[])
+int HttpClient::post(const char* aURLPath, const char* aContentType, long aContentLength, const byte aBody[])
 {
     return startRequest(aURLPath, HTTP_METHOD_POST, aContentType, aContentLength, aBody);
 }
@@ -336,7 +336,7 @@ int HttpClient::put(const String& aURLPath, const String& aContentType, const St
     return put(aURLPath.c_str(), aContentType.c_str(), aBody.length(), (const byte*)aBody.c_str());
 }
 
-int HttpClient::put(const char* aURLPath, const char* aContentType, int aContentLength, const byte aBody[])
+int HttpClient::put(const char* aURLPath, const char* aContentType, long aContentLength, const byte aBody[])
 {
     return startRequest(aURLPath, HTTP_METHOD_PUT, aContentType, aContentLength, aBody);
 }
@@ -361,7 +361,7 @@ int HttpClient::patch(const String& aURLPath, const String& aContentType, const 
     return patch(aURLPath.c_str(), aContentType.c_str(), aBody.length(), (const byte*)aBody.c_str());
 }
 
-int HttpClient::patch(const char* aURLPath, const char* aContentType, int aContentLength, const byte aBody[])
+int HttpClient::patch(const char* aURLPath, const char* aContentType, long aContentLength, const byte aBody[])
 {
     return startRequest(aURLPath, HTTP_METHOD_PATCH, aContentType, aContentLength, aBody);
 }
@@ -386,7 +386,7 @@ int HttpClient::del(const String& aURLPath, const String& aContentType, const St
     return del(aURLPath.c_str(), aContentType.c_str(), aBody.length(), (const byte*)aBody.c_str());
 }
 
-int HttpClient::del(const char* aURLPath, const char* aContentType, int aContentLength, const byte aBody[])
+int HttpClient::del(const char* aURLPath, const char* aContentType, long aContentLength, const byte aBody[])
 {
     return startRequest(aURLPath, HTTP_METHOD_DELETE, aContentType, aContentLength, aBody);
 }
@@ -542,7 +542,7 @@ bool HttpClient::endOfHeadersReached()
     return (iState == eReadingBody || iState == eReadingChunkLength || iState == eReadingBodyChunk);
 };
 
-int HttpClient::contentLength()
+long HttpClient::contentLength()
 {
     // skip the response headers, if they haven't been read already 
     if (!endOfHeadersReached())
@@ -555,7 +555,7 @@ int HttpClient::contentLength()
 
 String HttpClient::responseBody()
 {
-    int bodyLength = contentLength();
+    long bodyLength = contentLength();
     String response;
 
     if (bodyLength > 0)
@@ -586,7 +586,7 @@ String HttpClient::responseBody()
         }
     }
 
-    if (bodyLength > 0 && (unsigned int)bodyLength != response.length()) {
+    if (bodyLength > 0 && (long)bodyLength != response.length()) {
         // failure, we did not read in reponse content length bytes
         return String((const char*)NULL);
     }
